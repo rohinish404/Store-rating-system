@@ -2,6 +2,13 @@
 
 A full-stack application for managing stores with role-based access control. Built with NestJS backend and React frontend.
 
+# Demo
+
+
+https://github.com/user-attachments/assets/00cc706a-453b-4044-845b-15ca2fd0b0e0
+
+
+
 ## Tech Stack
 
 **Backend:**
