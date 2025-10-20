@@ -5,9 +5,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   app.useGlobalPipes(new ValidationPipe());
 
-  // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('NestJS LMS API')
     .setDescription('Learning Management System API with authentication and course management')
@@ -21,7 +28,7 @@ async function bootstrap() {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'JWT-auth', // This name will be used in @ApiBearerAuth()
+      'JWT-auth',
     )
     .build();
 

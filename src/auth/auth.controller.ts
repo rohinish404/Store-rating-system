@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/registerUserDto';
+import { RegisterDto } from './dto/register.dto';
 import { AuthGuard } from './auth.guard';
 import { UserService } from 'src/user/user.service';
 import {
@@ -16,6 +16,8 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { LoginDto } from './dto/login.dto';
+import { AuthResponseDto } from './dto/auth-response.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -29,18 +31,27 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({
     status: 201,
-    description: 'User successfully registered, returns JWT token',
+    description: 'User successfully registered, returns JWT token and user data',
+    type: AuthResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Bad request - validation failed' })
   async register(@Body() registerUserDto: RegisterDto) {
-    const token = await this.authService.registerUser(registerUserDto);
-    return token;
+    const response = await this.authService.registerUser(registerUserDto);
+    return response;
   }
 
   @Post('login')
   @ApiOperation({ summary: 'Login user' })
-  @ApiResponse({ status: 200, description: 'User successfully logged in' })
-  async login() {}
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully logged in, returns JWT token and user data',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized - invalid credentials' })
+  async login(@Body() loginUserDto: LoginDto) {
+    const response = await this.authService.loginUser(loginUserDto);
+    return response;
+  }
 
   @UseGuards(AuthGuard)
   @Get('profile')
@@ -54,14 +65,15 @@ export class AuthController {
   async getProfile(@Request() req) {
     const userId = req.user.sub;
 
-    const user = await this.userService.getUserById(userId);
+    const user = await this.userService.getUserById(userId as string);
 
     console.log(user);
     return {
       id: user?.id,
-      fname: user?.fname,
-      lname: user?.lname,
+      name: user?.name,
       email: user?.email,
+      address: user?.address,
+      role: user?.role,
     };
   }
 }
